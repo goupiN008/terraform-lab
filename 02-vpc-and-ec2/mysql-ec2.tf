@@ -1,0 +1,51 @@
+resource "aws_instance" "mysql" {
+  ami           = "ami-007a18d38016a0f4e"
+  instance_type = "t3.small"
+  vpc_security_group_ids = [
+    "sg-0d8bdc71aee9f"
+  ]
+  user_data = <<EOF
+#!/bin/bash
+# Install docker
+apt-get update
+apt-get install  \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release -y
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+usermod -aG docker ubuntu
+mkdir mysql
+# Install mysql via docker-compose
+echo '''version: '3'
+volumes:
+  mysql_data:
+      driver: local
+services:
+  mysql:
+      image: mysql:5.7
+      volumes:
+        - mysql_data:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: keycloak
+        MYSQL_USER: keycloak
+        MYSQL_PASSWORD: password''' > mysql/docker-compose.yaml
+docker-compose -f mysql/docker-compose.yaml up -d
+EOF
+  subnet_id = "subnet-00514b9f4cd6d4"
+  tags = {
+    Name = "${var.prefix}${count.index}"
+  }
+}
+output "mysql_private_ip" {
+  value       = "${aws_instance.mysql.private_ip}"
+  description = "PrivateIP address details"
+  sensitive   = true
+}
