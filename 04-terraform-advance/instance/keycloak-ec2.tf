@@ -1,8 +1,12 @@
+data "aws_security_group" "keycloak" {
+  name = "keycloak-dev"
+}
+
 resource "aws_instance" "keycloak" {
   ami           = "ami-0590f3a1742b17914"
   instance_type = "t3.small"
-  key_name = aws_key_pair.deployer.key_name
-  vpc_security_group_ids = [aws_security_group.keycloak.id]
+  key_name = aws_key_pair.dev-1.key_name
+  vpc_security_group_ids = [data.aws_security_group.keycloak.id]
   user_data = <<EOF
 #!/bin/bash
 # Install docker
@@ -41,12 +45,12 @@ services:
         - 8080:8080''' > /home/ubuntu/keycloak/docker-compose.yaml
 docker compose -f /home/ubuntu/keycloak/docker-compose.yaml up -d > /home/ubuntu/keycloak/init-logs.txt
 EOF
-  subnet_id = module.vpc.public_subnets[0]
+  subnet_id = var.public_subnet_id
   tags = {
     Name = "keycloak"
   }
 }
 output "keycloak_url" {
-  value       = "https://${aws_instance.keycloak.public_ip}:8080"
+  value       = "http://${aws_instance.keycloak.public_ip}:8080"
   description = "Keycloak url"
 }

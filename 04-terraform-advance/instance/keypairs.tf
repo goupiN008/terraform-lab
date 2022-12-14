@@ -1,0 +1,4 @@
+resource "aws_key_pair" "dev-1" {
+  key_name   = "dev-1"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3ioOJJxDfGhuNL1BVtYMBgyBEmIt8rpMIEo8OhVI+jeePY3RhXB1jlX+EEaYtCHwZ6RcL5TNLqOTfGTOOwPps19eb6vnDRpMovKZ4VVAhvfad+alINYL8DFAZkuGGLODK7vXSNixTiCEZbuX4f7bbuLgE/kcMr+1RWuxZ6BfW29HxGG3QPZD2SA/odUC7XjrXhFI3XxRM/ZA9Xz7fmhjHtuYLExyQt16Ka7dXliPCBwij50dllXB3bvxHx/9r4rTMMoCZaTvzjyc48F3sk+yrB7r55YbMyKhp4L3kn72MIp5lo00XKkpd2hpUyc7Pmwyh9LhRo0k/Hi4VzR+/H3bLyfkfxub7MswIhHj1O4aZbV58UxDzA+A8dAwzeYw/LfqBFM1zWkjF5ggU3xr+RmBC6uUu+zPzNYP7ShJ444wFdSCSMdkGdqGItD6+HkzgwejdPzJXWFwYR4Q0nT/vOWAFXRebUyFO8HtweRR0+iqD74c1HdO8X6K9+vp9gx1gYIU= chalathornprasongtham@goupin008-2.local"
+  }

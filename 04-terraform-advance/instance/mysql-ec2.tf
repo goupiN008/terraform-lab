@@ -1,8 +1,12 @@
+data "aws_security_group" "mysql" {
+  name = "mysql-dev"
+}
+
 resource "aws_instance" "mysql" {
   ami           = "ami-0590f3a1742b17914"
   instance_type = "t3.small"
-  key_name = aws_key_pair.deployer.key_name
-  vpc_security_group_ids = [aws_security_group.mysql.id]
+  key_name = aws_key_pair.dev-1.key_name
+  vpc_security_group_ids = [data.aws_security_group.mysql.id]
   
   user_data = <<EOF
 #!/bin/bash
@@ -32,6 +36,8 @@ services:
       image: mysql:5.7
       volumes:
         - mysql_data:/var/lib/mysql
+      ports:
+        - 3306:3306
       environment:
         MYSQL_ROOT_PASSWORD: root
         MYSQL_DATABASE: keycloak
@@ -39,7 +45,7 @@ services:
         MYSQL_PASSWORD: password''' > /home/ubuntu/mysql/docker-compose.yaml
 docker compose -f /home/ubuntu/mysql/docker-compose.yaml up -d > /home/ubuntu/mysql/init-logs.txt
 EOF
-  subnet_id = module.vpc.private_subnets[0]
+  subnet_id = var.private_subnet_id
   tags = {
     Name = "mysql"
   }
